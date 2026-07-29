@@ -1,8 +1,7 @@
-# Personagem.java
+import java.util.Objects;
 
-```java
-// Classe abstrata que representa um personagem do jogo
-public abstract class Personagem {
+// Classe base Personagem
+public class Personagem {
 
     // Atributos encapsulados
     private String nome;
@@ -18,8 +17,8 @@ public abstract class Personagem {
 
         this.nome = nome;
         this.classe = classe;
-        this.nivel = nivel;
-        this.pontosDeVida = pontosDeVida;
+        setNivel(nivel);
+        setPontosDeVida(pontosDeVida);
         this.poderBase = poderBase;
     }
 
@@ -44,34 +43,77 @@ public abstract class Personagem {
         return poderBase;
     }
 
-    // Método abstrato
-    public abstract void usarHabilidade();
+    // Setters com validação
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setClasse(String classe) {
+        this.classe = classe;
+    }
+
+    public void setNivel(int nivel) {
+        if (nivel >= 0) {
+            this.nivel = nivel;
+        }
+    }
+
+    public void setPontosDeVida(int pontosDeVida) {
+        if (pontosDeVida >= 0) {
+            this.pontosDeVida = pontosDeVida;
+        }
+    }
+
+    public void setPoderBase(double poderBase) {
+        this.poderBase = poderBase;
+    }
+
+    // Método que será sobrescrito nas subclasses
+    public void usarHabilidade() {
+        System.out.println(nome + " usa uma habilidade genérica.");
+    }
 
     // Exibe os dados do personagem
-    public void exibirStatus() {
+    @Override
+    public String toString() {
 
-        System.out.println("===== STATUS DO PERSONAGEM =====");
-        System.out.println("Nome: " + nome);
-        System.out.println("Classe: " + classe);
-        System.out.println("Nível: " + nivel);
-        System.out.println("Pontos de Vida: " + pontosDeVida);
-        System.out.println("Poder Base: " + poderBase);
+        return "Nome: " + nome
+                + "\nClasse: " + classe
+                + "\nNível: " + nivel
+                + "\nPontos de Vida: " + pontosDeVida
+                + "\nPoder Base: " + poderBase;
+    }
+
+    // Dois personagens são iguais se nome e classe forem iguais
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof Personagem)) {
+            return false;
+        }
+
+        Personagem outro = (Personagem) obj;
+
+        return Objects.equals(nome, outro.nome)
+                && Objects.equals(classe, outro.classe);
+    }
+
+    // Consistente com equals
+    @Override
+    public int hashCode() {
+        return Objects.hash(nome, classe);
     }
 }
-```
-
----
-
-# Mago.java
-
-```java
+Mago.java
 // Classe Mago herda de Personagem
 public class Mago extends Personagem {
 
-    // Atributo específico do mago
     private String elemento;
 
-    // Construtor
     public Mago(String nome, int nivel,
                 int pontosDeVida, double poderBase,
                 String elemento) {
@@ -80,43 +122,38 @@ public class Mago extends Personagem {
         this.elemento = elemento;
     }
 
-    // Getter
     public String getElemento() {
         return elemento;
     }
 
-    // Implementação da habilidade do mago
+    public void setElemento(String elemento) {
+        this.elemento = elemento;
+    }
+
+    // Sobrescrita da habilidade
     @Override
     public void usarHabilidade() {
 
         System.out.println(
-                "Mago " + getNome()
+                getNome()
                 + " lança Bola de Fogo do elemento "
                 + elemento + "!");
     }
 
-    // Exibe também o elemento
+    // Inclui o elemento no toString
     @Override
-    public void exibirStatus() {
+    public String toString() {
 
-        super.exibirStatus();
-        System.out.println("Elemento: " + elemento);
+        return super.toString()
+                + "\nElemento: " + elemento;
     }
 }
-```
-
----
-
-# Guerreiro.java
-
-```java
+Guerreiro.java
 // Classe Guerreiro herda de Personagem
 public class Guerreiro extends Personagem {
 
-    // Atributo específico do guerreiro
     private String arma;
 
-    // Construtor
     public Guerreiro(String nome, int nivel,
                      int pontosDeVida, double poderBase,
                      String arma) {
@@ -125,39 +162,36 @@ public class Guerreiro extends Personagem {
         this.arma = arma;
     }
 
-    // Getter
     public String getArma() {
         return arma;
     }
 
-    // Implementação da habilidade do guerreiro
+    public void setArma(String arma) {
+        this.arma = arma;
+    }
+
+    // Sobrescrita da habilidade
     @Override
     public void usarHabilidade() {
 
         System.out.println(
-                "Guerreiro " + getNome()
+                getNome()
                 + " ataca com sua "
                 + arma + "!");
     }
 
-    // Exibe também a arma
+    // Inclui a arma no toString
     @Override
-    public void exibirStatus() {
+    public String toString() {
 
-        super.exibirStatus();
-        System.out.println("Arma: " + arma);
+        return super.toString()
+                + "\nArma: " + arma;
     }
 }
-```
-
----
-
-# Main.java
-
-```java
+Main.java
 import java.util.ArrayList;
 
-// Classe principal do programa
+// Classe principal
 public class Main {
 
     public static void main(String[] args) {
@@ -167,10 +201,10 @@ public class Main {
 
         // Adicionando magos
         personagens.add(new Mago(
-                "Elenara", 12, 180, 95.0, "Fogo"));
+                "Eldoran", 7, 150, 80.0, "Fogo"));
 
         personagens.add(new Mago(
-                "Merlin", 20, 150, 120.0, "Gelo"));
+                "Merlin", 12, 180, 95.0, "Gelo"));
 
         // Adicionando guerreiros
         personagens.add(new Guerreiro(
@@ -182,11 +216,54 @@ public class Main {
         // Percorre a lista e executa os métodos
         for (Personagem personagem : personagens) {
 
-            personagem.exibirStatus();
+            // Exibe status completo
+            System.out.println(
+                    "===== STATUS DO PERSONAGEM =====");
+
+            System.out.println(personagem);
+
+            // Executa habilidade
             personagem.usarHabilidade();
 
+            // Verifica o tipo real do objeto
+            if (personagem instanceof Mago) {
+
+                System.out.println(
+                        "O personagem "
+                        + personagem.getNome()
+                        + " é um Mago de nível "
+                        + personagem.getNivel() + ".");
+
+            } else if (personagem instanceof Guerreiro) {
+
+                System.out.println(
+                        "O personagem "
+                        + personagem.getNome()
+                        + " é um Guerreiro de nível "
+                        + personagem.getNivel() + ".");
+            }
+
             System.out.println(
-                    "-------------------------------------");
+                    "------------------------------------");
+        }
+
+        // Comparação de personagens
+        Personagem p1 = new Mago(
+                "Eldoran", 7, 150, 80.0, "Fogo");
+
+        Personagem p2 = new Mago(
+                "Eldoran", 20, 300, 150.0, "Gelo");
+
+        // Verifica igualdade
+        if (p1.equals(p2)) {
+
+            System.out.println(
+                    "Os personagens p1 e p2 são iguais.");
+
+        } else {
+
+            System.out.println(
+                    "Os personagens p1 e p2 são diferentes.");
         }
     }
 }
